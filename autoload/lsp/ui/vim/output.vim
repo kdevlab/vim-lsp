@@ -164,7 +164,7 @@ function! s:adjust_float_placement(bufferlines, maxwidth) abort
     if s:use_nvim_float
       let l:win_config = {}
       let l:height = min([winheight(s:winid), a:bufferlines])
-      let l:width = min([winwidth(s:winid), a:maxwidth])
+      let l:width = min([winwidth(s:winid), a:maxwidth]) + 4
       let l:win_config = s:get_float_positioning(l:height, l:width)
       call nvim_win_set_config(s:winid, l:win_config )
     endif
