@@ -108,7 +108,7 @@ function! lsp#ui#vim#output#floatingpreview(data) abort
     let s:winid = nvim_open_win(buf, v:true, l:opts)
     call nvim_win_set_option(s:winid, 'winhl', 'Normal:Pmenu,NormalNC:Pmenu')
     call nvim_win_set_option(s:winid, 'foldenable', v:false)
-    call nvim_win_set_option(s:winid, 'wrap', v:true)
+    call nvim_win_set_option(s:winid, 'wrap', v:false)
     call nvim_win_set_option(s:winid, 'statusline', '')
     call nvim_win_set_option(s:winid, 'number', v:false)
     call nvim_win_set_option(s:winid, 'relativenumber', v:false)
@@ -277,6 +277,22 @@ function! s:align_preview(options) abort
     endif
 endfunction
 
+function! s:my_strdisplaywidth(line) abort
+    let l:line = a:line
+    call lsp#log('inspecting line', l:line)
+    call lsp#log('line is now', strdisplaywidth(l:line), 'long')
+
+    if has('conceal')
+        let l:line = substitute(l:line, '^{{{code.begin.\w*}}}', '', '')
+        let l:line = substitute(l:line, '{{{code.end.\w*}}}$', '', '')
+    endif
+
+    call lsp#log('transformed line to', l:line)
+    call lsp#log('line is now', strdisplaywidth(l:line), 'long')
+
+    return strdisplaywidth(l:line)
+endfunction
+
 function! lsp#ui#vim#output#preview(data, options) abort
     if s:winid && type(s:preview_data) == type(a:data)
        \ && s:preview_data == a:data
@@ -305,7 +321,7 @@ function! lsp#ui#vim#output#preview(data, options) abort
 
     " Get size information while still having the buffer active
     let l:bufferlines = line('$')
-    let l:maxwidth = max(map(getline(1, '$'), 'strdisplaywidth(v:val)'))
+    let l:maxwidth = max(map(getline(1, '$'), 's:my_strdisplaywidth(v:val)'))
 
     if s:use_preview
         " Set statusline
