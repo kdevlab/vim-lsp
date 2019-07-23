@@ -201,7 +201,13 @@ endfunction
 
 function! lsp#utils#col(m) abort
     if g:lsp_use_utf16
-      return lsp#utils#strlen(getline(a:m)[:col(a:m)])
+        let col = lsp#utils#strlen(getline(a:m)[:col(a:m) - 1])
+
+        if mode() ==# 'i' && col(a:m) == col('$')
+            let col = col + 1
+        endif
+
+        return col
     endif
-    return a:m
+    return col(a:m)
 endfunction
