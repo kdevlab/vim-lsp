@@ -281,11 +281,16 @@ endfunction
 
 function! s:my_strdisplaywidth(line) abort
     let l:line = a:line
+    call lsp#log('inspecting line', l:line)
+    call lsp#log('line is now', strdisplaywidth(l:line), 'long')
 
     if has('conceal')
         let l:line = substitute(l:line, '^{{{code.begin.\w*}}}', '', '')
         let l:line = substitute(l:line, '{{{code.end.\w*}}}$', '', '')
     endif
+
+    call lsp#log('transformed line to', l:line)
+    call lsp#log('line is now', strdisplaywidth(l:line), 'long')
 
     return strdisplaywidth(l:line)
 endfunction
