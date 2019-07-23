@@ -302,7 +302,7 @@ function! lsp#ui#vim#output#preview(data, options) abort
         let l:ft = a:options['filetype']
     endif
 
-    call setbufvar(winbufnr(s:winid), 'lsp_syntax_highlights', a:syntax_lines)
+    call setbufvar(winbufnr(s:winid), 'lsp_syntax_highlights', l:syntax_lines)
     call s:setcontent(l:lines, l:ft)
 
     " Get size information while still having the buffer active
