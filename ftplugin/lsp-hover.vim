@@ -9,7 +9,7 @@ endif
 if has('conceal')
     setlocal conceallevel=2
 endif
-setlocal nocursorline nofoldenable nonumber norelativenumber nowrap
+setlocal nocursorline nofoldenable nonumber norelativenumber
 
 if has('syntax')
     setlocal nospell
@@ -17,6 +17,6 @@ endif
 
 let b:undo_ftplugin = 'setlocal pvw< bt< bh< swf< bl< cul< fen<' .
             \ (has('syntax') ? ' spell<' : '') .
-            \ ' number< relativenumber< wrap<' .
+            \ ' number< relativenumber<' .
             \ (has('conceal') ? ' conceallevel<' : '') .
             \ ' | unlet! g:markdown_fenced_languages'
