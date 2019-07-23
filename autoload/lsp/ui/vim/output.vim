@@ -167,6 +167,8 @@ function! s:adjust_float_placement(bufferlines, maxwidth) abort
       let l:width = min([winwidth(s:winid), a:maxwidth])
       let l:win_config = s:get_float_positioning(l:height, l:width)
       call nvim_win_set_config(s:winid, l:win_config )
+    elseif s:use_vim_popup
+      call popup_setoptions(s:winid, {'maxwidth': a:maxwidth, 'minwidth': a:maxwidth})
     endif
 endfunction
 
@@ -319,9 +321,9 @@ function! lsp#ui#vim#output#preview(data, options) abort
 
     call s:setcontent(l:lines, l:ft)
 
-    " Get size information while still having the buffer active
-    let l:bufferlines = line('$')
-    let l:maxwidth = max(map(getline(1, '$'), 's:my_strdisplaywidth(v:val)'))
+    " Get size information
+    let l:bufferlines = len(l:lines)
+    let l:maxwidth = max(map(l:lines, 's:my_strdisplaywidth(v:val)'))
 
     if s:use_preview
         " Set statusline
@@ -338,14 +340,12 @@ function! lsp#ui#vim#output#preview(data, options) abort
     echo ''
 
     if s:winid && (s:use_vim_popup || s:use_nvim_float)
+      call s:adjust_float_placement(l:bufferlines, l:maxwidth)
+      call s:set_cursor(l:current_window_id, a:options)
+
       if s:use_nvim_float
         " Neovim floats
-        call s:adjust_float_placement(l:bufferlines, l:maxwidth)
-        call s:set_cursor(l:current_window_id, a:options)
         call s:add_float_closing_hooks()
-      elseif s:use_vim_popup
-        " Vim popups
-        call s:set_cursor(l:current_window_id, a:options)
       endif
 
       doautocmd User lsp_float_opened
