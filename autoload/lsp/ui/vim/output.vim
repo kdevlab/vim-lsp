@@ -354,14 +354,9 @@ function! s:append(data, lines) abort
 
         return 'markdown'
     elseif type(a:data) == type({}) && has_key(a:data, 'language')
-        if has('conceal')
-            let l:value = printf('{{{code.begin.%s}}}%s{{{code.end.%s}}}', a:data.language, a:data.value, a:data.language)
-            call extend(a:lines, split(l:value, '\n'))
-        else
-            call add(a:lines, '```'.a:data.language)
-            call extend(a:lines, split(a:data.value, '\n'))
-            call add(a:lines, '```')
-        endif
+        call add(a:lines, '```'.a:data.language)
+        call extend(a:lines, split(a:data.value, '\n'))
+        call add(a:lines, '```')
 
         return 'markdown'
     elseif type(a:data) == type({}) && has_key(a:data, 'kind')
