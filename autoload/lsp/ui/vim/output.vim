@@ -295,12 +295,14 @@ function! lsp#ui#vim#output#preview(data, options) abort
 
     let s:preview_data = a:data
     let l:lines = []
-    let l:ft = s:append(a:data, l:lines)
+    let l:syntax_lines = []
+    let l:ft = s:append(a:data, l:lines, l:syntax_lines)
 
     if has_key(a:options, 'filetype')
         let l:ft = a:options['filetype']
     endif
 
+    call setbufvar(winbufnr(s:winid), 'lsp_syntax_highlights', a:syntax_lines)
     call s:setcontent(l:lines, l:ft)
 
     " Get size information while still having the buffer active
@@ -342,10 +344,10 @@ function! lsp#ui#vim#output#preview(data, options) abort
     return ''
 endfunction
 
-function! s:append(data, lines) abort
+function! s:append(data, lines, syntax_lines) abort
     if type(a:data) == type([])
         for l:entry in a:data
-            call s:append(entry, a:lines)
+            call s:append(entry, a:lines, a:syntax_lines)
         endfor
 
         return 'markdown'
@@ -354,9 +356,15 @@ function! s:append(data, lines) abort
 
         return 'markdown'
     elseif type(a:data) == type({}) && has_key(a:data, 'language')
-        call add(a:lines, '```'.a:data.language)
-        call extend(a:lines, split(a:data.value, '\n'))
-        call add(a:lines, '```')
+        let l:new_lines = split(a:data.value, '\n')
+
+        let l:i = 1
+        while l:i <= len(l:new_lines)
+            call add(a:syntax_lines, { 'line': len(a:lines) + l:i, 'language': a:data.language })
+            let l:i += 1
+        endwhile
+
+        call extend(a:lines, l:new_lines)
 
         return 'markdown'
     elseif type(a:data) == type({}) && has_key(a:data, 'kind')
