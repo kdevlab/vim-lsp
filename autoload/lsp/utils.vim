@@ -185,23 +185,3 @@ function! lsp#utils#echo_with_truncation(msg) abort
 
     exec 'echo l:msg'
 endfunction
-
-function! lsp#utils#count_utf16_code_units(str) abort
-    let l:rs = split(a:str, '\zs')
-    let l:len = len(l:rs)
-    return l:len + len(filter(l:rs, 'char2nr(v:val)>=0x10000'))
-endfunction
-
-function! lsp#utils#strlen(str) abort
-    if g:lsp_use_utf16
-        return lsp#utils#count_utf16_code_units(a:str)
-    endif
-    return strlen(a:str)
-endfunction
-
-function! lsp#utils#col(m) abort
-    if g:lsp_use_utf16
-      return lsp#utils#strlen(getline(a:m)[:col(a:m)])
-    endif
-    return a:m
-endfunction
