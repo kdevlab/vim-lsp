@@ -6,9 +6,11 @@ if has('patch-8.1.1517') && g:lsp_preview_float && !has('nvim')
 else
   setlocal previewwindow buftype=nofile bufhidden=wipe noswapfile nobuflisted
 endif
-if has('conceal')
+
+if has('conceal') && b:lsp_do_conceal
     setlocal conceallevel=2
 endif
+
 setlocal nocursorline nofoldenable nonumber norelativenumber
 
 if has('syntax')
@@ -18,5 +20,5 @@ endif
 let b:undo_ftplugin = 'setlocal pvw< bt< bh< swf< bl< cul< fen<' .
             \ (has('syntax') ? ' spell<' : '') .
             \ ' number< relativenumber<' .
-            \ (has('conceal') ? ' conceallevel<' : '') .
+            \ (has('conceal') && b:lsp_do_conceal ? ' conceallevel<' : '') .
             \ ' | unlet! g:markdown_fenced_languages'
