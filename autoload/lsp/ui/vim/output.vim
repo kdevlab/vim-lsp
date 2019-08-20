@@ -6,6 +6,10 @@ let s:winid = v:false
 let s:prevwin = v:false
 let s:preview_data = v:false
 
+function! s:vim_popup_closed(...) abort
+    let s:preview_data = v:false
+endfunction
+
 function! lsp#ui#vim#output#closepreview() abort
   if win_getid() == s:winid
     " Don't close if window got focus
@@ -70,9 +74,9 @@ function! s:get_float_positioning(height, width) abort
     let l:y = winline()
     if l:y + l:height >= winheight(0)
       " Float does not fit
-      if l:y - 2 > l:height
+      if l:y > l:height
         " Fits above
-        let l:y = winline() - l:height -1
+        let l:y = winline() - l:height - 1
       elseif l:y - 2 > winheight(0) - l:y
         " Take space above cursor
         let l:y = 1
@@ -99,9 +103,13 @@ function! lsp#ui#vim#output#floatingpreview(data) abort
     let l:buf = nvim_create_buf(v:false, v:true)
     call setbufvar(l:buf, '&signcolumn', 'no')
 
-    " Try to get as much pace right-bolow the cursor, but at least 10x10
+    " Try to get as much space around the cursor, but at least 10x10
     let l:width = max([s:bufwidth(), 10])
-    let l:height = max([&lines - winline() + 1, 10])
+    let l:height = max([&lines - winline() + 1, winline() - 1, 10])
+
+    if g:lsp_preview_max_height > 0
+        let l:height = min([g:lsp_preview_max_height, l:height])
+    endif
 
     let l:opts = s:get_float_positioning(l:height, l:width)
 
@@ -119,10 +127,15 @@ function! lsp#ui#vim#output#floatingpreview(data) abort
     let l:options = {
                 \ 'moved': 'any',
                 \ 'border': [1, 1, 1, 1],
+                \ 'callback': function('s:vim_popup_closed')
                 \ }
 
     if g:lsp_preview_max_width > 0
         let l:options['maxwidth'] = g:lsp_preview_max_width
+    endif
+
+    if g:lsp_preview_max_height > 0
+        let l:options['maxheight'] = g:lsp_preview_max_height
     endif
 
     let s:winid = popup_atcursor('...', l:options)

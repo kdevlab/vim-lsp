@@ -30,6 +30,7 @@ CONTENTS                                                  *vim-lsp-contents*
       g:lsp_peek_alignment                  |g:lsp_peek_alignment|
       g:lsp_preview_max_width               |g:lsp_preview_max_width|
       g:lsp_hover_conceal                   |g:lsp_hover_conceal|
+      g:lsp_preview_max_height		          |g:lsp_preview_max_height|
     Functions                             |vim-lsp-functions|
       enable                                |vim-lsp-enable|
       disable                               |vim-lsp-disable|
@@ -444,6 +445,13 @@ g:lsp_hover_conceal                                   *g:lsp_hover_conceal*
     you're using Vim in a terminal.
 
     To override this setting per server, see |vim-lsp-hover_conceal|.
+
+g:lsp_preview_max_height                         *g:lsp_preview_max_height*
+    Type: |Number|
+    Default: `-1`
+
+    If positive, determines the maximum height of the preview window in
+    characters. Use a value of `-1` to disable setting a maximum height.
 
 ===============================================================================
 FUNCTIONS	                                        *vim-lsp-functions*
