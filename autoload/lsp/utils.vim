@@ -246,6 +246,7 @@ function! lsp#utils#base64_decode(data) abort
     endif
 
     return l:ret
+endfunction
 
 " Convert a character-index (0-based) to byte-index (1-based)
 " This function requires a buffer specifier (expr, see :help bufname()),
