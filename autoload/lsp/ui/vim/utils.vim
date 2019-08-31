@@ -13,7 +13,8 @@ function! lsp#ui#vim#utils#locations_to_loc_list(result) abort
             if s:is_file_uri(l:location['uri'])
                 let l:path = lsp#utils#uri_to_path(l:location['uri'])
                 let l:line = l:location['range']['start']['line'] + 1
-                let l:col = l:location['range']['start']['character'] + 1
+                let l:char = l:location['range']['start']['character']
+                let l:col = lsp#utils#to_col(l:path, l:line, l:char)
                 let l:index = l:line - 1
 
                 if has_key(l:cache, l:path)
@@ -60,6 +61,14 @@ let s:symbol_kinds = {
     \ '16': 'number',
     \ '17': 'boolean',
     \ '18': 'array',
+    \ '19': 'object',
+    \ '20': 'key',
+    \ '21': 'null',    
+    \ '22': 'enum member',    
+    \ '23': 'struct',    
+    \ '24': 'event',    
+    \ '25': 'operator',    
+    \ '26': 'type parameter',    
     \ }
 
 let s:diagnostic_severity = {
@@ -77,20 +86,24 @@ function! lsp#ui#vim#utils#symbols_to_loc_list(symbols) abort
     for l:symbol in a:symbols
         let l:location = l:symbol['location']
 
-        if s:is_file_uri(l:location['uri'])
-            let l:path = lsp#utils#uri_to_path(l:location['uri'])
-            let l:bufnr = bufnr(l:path)
-            let l:line = l:location['range']['start']['line'] + 1
-            let l:col = l:location['range']['start']['character'] + 1
-
-            call add(l:list, {
-                \ 'filename': l:path,
-                \ 'lnum': l:line,
-                \ 'col': l:col,
-                \ 'text': s:get_symbol_text_from_kind(l:symbol['kind']) . ' : ' . l:symbol['name'],
-                \ })
-        endif
-    endfor
+    if !empty(l:locations) " some servers also return null so check to make sure it isn't empty
+        for l:symbol in a:result['response']['result']
+            let l:location = l:symbol['location']
+            if s:is_file_uri(l:location['uri'])
+                let l:path = lsp#utils#uri_to_path(l:location['uri'])
+                let l:bufnr = bufnr(l:path)
+                let l:line = l:location['range']['start']['line'] + 1
+                let l:char = l:location['range']['start']['character']
+                let l:col = lsp#utils#to_col(l:path, l:line, l:char)
+                call add(l:list, {
+                    \ 'filename': l:path,
+                    \ 'lnum': l:line,
+                    \ 'col': l:col,
+                    \ 'text': s:get_symbol_text_from_kind(l:symbol['kind']) . ' : ' . l:symbol['name'],
+                    \ })
+            endif
+        endfor
+    endif
 
     return l:list
 endfunction
@@ -121,7 +134,8 @@ function! lsp#ui#vim#utils#diagnostics_to_loc_list(result) abort
             endif
             let l:text .= l:item['message']
             let l:line = l:item['range']['start']['line'] + 1
-            let l:col = l:item['range']['start']['character'] + 1
+            let l:char = l:item['range']['start']['character']
+            let l:col = lsp#utils#to_col(l:path, l:line, l:char)
             call add(l:list, {
                 \ 'filename': l:path,
                 \ 'lnum': l:line,
