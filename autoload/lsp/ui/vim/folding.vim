@@ -62,7 +62,7 @@ function! lsp#ui#vim#folding#send_request(server_name, buf, sync) abort
                 \ },
                 \ 'on_notification': function('s:handle_fold_request', [a:server_name]),
                 \ 'sync': a:sync
-                \ })
+                \ }, a:buf)
 endfunction
 
 function! s:foldexpr(server, buf, linenr) abort
